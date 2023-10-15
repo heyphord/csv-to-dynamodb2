@@ -29,6 +29,7 @@ export function convertCsvToDynamoObjects(
 
   let dynamoObj: DynamoRoot[] = [];
   let dynamoS3Format : object[] = [];
+  let dynamoS3String : string = "";
 
   const data = lines.slice(1);
   
@@ -49,21 +50,25 @@ export function convertCsvToDynamoObjects(
       if (value.length === 0) return;
       
       const header = headers[index]
+      
       put.Item[header.name] = {[header.type]: value}
     });
-
     dynamoS3Format.push(  {Item: put.Item } );
-    console.log({Item: put.Item});
+
+    dynamoS3String = dynamoS3String + JSON.stringify({Item: put.Item }) + "\n";
     
     
     if(Object.keys(put.Item).length > 0) dynamoObj[i] = { Put: put }
 
   });
+  console.log(dynamoS3String);
+  
   console.log("---------end copy-------------");
 
   
   
   // return [JSON.stringify(dynamoObj, null, '\t'), dynamoS3Format]
+  return dynamoS3String;
   return JSON.stringify(dynamoS3Format ,null ,'\t')
   return JSON.stringify(dynamoObj ,null ,'\t')
 }
